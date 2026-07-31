@@ -1,5 +1,6 @@
 import logging
 import time
+
 from fabric import Connection
 
 
@@ -33,7 +34,7 @@ class SshWorker:
             except AssertionError:
                 self.logger.info(f"Worker {self.ip} returned invalid output.")
                 time.sleep(5)
-            except:
+            except Exception:
                 self.logger.info(f"Worker {self.ip} returned unknown exception.")
                 time.sleep(5)
         return True

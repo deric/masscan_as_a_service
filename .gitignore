@@ -2,8 +2,15 @@
 .idea
 
 __pycache__
+*.py[cod]
 
-Pipfile.lock
 build/
 dist/
 *.egg-info/
+
+.venv/
+venv/
+
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/

@@ -2,7 +2,6 @@
 
 import argparse
 import datetime
-from functools import partial
 import io
 import json
 import logging
@@ -11,8 +10,9 @@ import signal
 import socket
 import sys
 import tempfile
+from functools import partial
 from json import JSONDecodeError
-from typing import Any, List, Dict
+from typing import Any
 
 import yaml
 
@@ -22,7 +22,7 @@ from .vm_operator.hetzner_cloud_operator import HetznerCloudOperator
 LOG_FORMAT = '%(asctime)s %(filename)s:%(lineno)d %(levelname)s %(message)s'
 
 
-def _args_parser() -> Dict[str, argparse.ArgumentParser]:
+def _args_parser() -> dict[str, argparse.ArgumentParser]:
     """
     Parse commandline arguments.
     :return: argparse.Namespace for simple use
@@ -105,8 +105,7 @@ def _parse_args() -> argparse.Namespace:
     return _args_parser()['global'].parse_args()
 
 
-def convert_list_of_ports_to_dict(list_of_ports: List[Dict[str, Any]]
-                                  ) -> dict:
+def convert_list_of_ports_to_dict(list_of_ports: list[dict[str, Any]]) -> dict:
     """Helper to convert list of open ports to dict, e.g.:
 
     [{
@@ -153,7 +152,7 @@ def process_masscan_results(masscan_json_output_path: str) -> dict:
         json_data = []
         try:
             json_data = json.loads(
-                "".join(raw_data.split()).rstrip(",]") + str("]"))
+                "".join(raw_data.split()).rstrip(",]") + "]")
         except JSONDecodeError as e:
             print(e)
     output = {}
@@ -166,7 +165,7 @@ def process_masscan_results(masscan_json_output_path: str) -> dict:
 def get_all_primary_ips(name: str, api_key: str) -> dict:
     hcloud = HetznerCloudOperator(api_key)
 
-    machines = dict()
+    machines = {}
 
     logging.info("Scanning project: %s", name)
 
@@ -184,10 +183,10 @@ def get_all_primary_ips(name: str, api_key: str) -> dict:
 
 
 def get_api_targets(api_keys_path: str) -> dict:
-    with open(api_keys_path, "r") as api_keys:
+    with open(api_keys_path) as api_keys:
         api_keys = yaml.safe_load(api_keys)
 
-    targets = dict()
+    targets = {}
     for api_key in api_keys:
         targets.update(get_all_primary_ips(api_key['name'], api_key['token']))
 
@@ -227,7 +226,7 @@ def main() -> None:
         logging.getLogger().setLevel(logging.DEBUG)
 
     logging.info("Masscan summons to an existence")
-    with open(args.env_config, 'r') as stream:
+    with open(args.env_config) as stream:
         env_config = yaml.load(stream, Loader=yaml.FullLoader)
 
     if env_config['provider'] and env_config['provider']['type'] in ['hetzner_cloud', 'hcloud']:
@@ -253,8 +252,8 @@ def main() -> None:
 
             ssh_key_name = 'masscan-' + datetime.date.strftime(datetime.datetime.now(),
                                                                '%Y%m%d-%H%M%S')
-            labels = dict(map(lambda l: l.split('='), args.label))
-            with open(args.ssh_public_key, 'r') as stream:
+            labels = dict(label.split('=') for label in args.label)
+            with open(args.ssh_public_key) as stream:
                 key = stream.read()
                 hcloud.add_new_ssh_key(ssh_key_name, key, labels)
 
@@ -287,10 +286,7 @@ def main() -> None:
 
                     results = process_masscan_results(tmp_output_file)
                     for ip in results:
-                        if args.no_resolve:
-                            name = ip
-                        else:
-                            name = resolve(ip)
+                        name = ip if args.no_resolve else resolve(ip)
                         output_file = os.path.join(args.destination_dir, f"{name}.json")
                         with open(output_file, 'w') as stream:
                             host = results[ip]

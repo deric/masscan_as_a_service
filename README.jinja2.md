@@ -8,19 +8,28 @@ WARNING: commence port scanning from and to systems you operate, and you are all
 
 ## Installation
 
-Whole project is distributed as a Python package to make it simple to include in your tooling. It is **not** yet on https://pypi.org. Example `Pipfile` for **your** project:
+Whole project is distributed as a Python package (PEP 621 / `pyproject.toml`) to make it simple to include in your tooling. It is **not** yet on https://pypi.org, so install it straight from git:
 
-```pipfile
-[[source]]
-url = "https://pypi.python.org/simple"
-verify_ssl = true
-name = "pypi"
-
-[packages]
-masscan_as_a_service = {git = "https://github.com/bobek/masscan_as_a_service.git", editable = true}
+```shell
+pip install git+https://github.com/bobek/masscan_as_a_service.git
 ```
 
-This will give you `masscan_as_a_service` binary in your `bin` directory. As usual, `virtualenv` / `pipenv` is recommended.
+Or declare it as a dependency of **your** project in `pyproject.toml`:
+
+```toml
+[project]
+dependencies = [
+    "masscan-as-a-service @ git+https://github.com/bobek/masscan_as_a_service.git",
+]
+```
+
+This will give you `masscan_as_a_service` binary in your `bin` directory. As usual, a virtual environment (`python -m venv`, `uv`, ...) is recommended.
+
+For development, clone the repository and install it in editable mode with the dev extras:
+
+```shell
+pip install -e '.[dev]'
+```
 
 ## Theory of Operation
 1. use some system to schedule regular executions. For example gitlab CD or github actions.
