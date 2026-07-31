@@ -37,7 +37,7 @@ dependencies = [
     "scp",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
     "jinja2",
     "pytest",
@@ -62,6 +62,13 @@ include = [
     "/README.md",
     "/AUTHORS",
 ]
+
+[tool.uv]
+# Quarantine freshly published releases: a package version has to be at least
+# 11 days old before we will resolve to it. This is recorded in uv.lock, so it
+# has to be declared here rather than only in a developer's global uv config -
+# otherwise CI resolves differently and `uv sync --locked` fails.
+exclude-newer = "11 days"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
