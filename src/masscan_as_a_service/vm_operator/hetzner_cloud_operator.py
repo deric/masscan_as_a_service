@@ -67,7 +67,7 @@ class HetznerCloudOperator:
             # parse delete_after label (use UTC if label has no explicit timezone)
             delete_after = datetime.fromisoformat(object_labels['delete_after'])
             if delete_after.tzinfo is None:
-                delete_after.replace(tzinfo=timezone.utc)
+                delete_after = delete_after.replace(tzinfo=timezone.utc)
 
             if datetime.now(timezone.utc) > delete_after:
                 return True

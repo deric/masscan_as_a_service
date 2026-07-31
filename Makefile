@@ -1,4 +1,4 @@
-.PHONY: all install lint format build clean
+.PHONY: all install lint fix test build clean
 
 all: README.md
 
@@ -10,14 +10,15 @@ install:
 
 lint:
 	ruff check .
-	ruff format --check .
 
-format:
+fix:
 	ruff check --fix .
-	ruff format .
+
+test:
+	python3 -m pytest
 
 build:
 	python3 -m build
 
 clean:
-	rm -rf build dist src/*.egg-info
+	rm -rf build dist src/*.egg-info .pytest_cache .ruff_cache

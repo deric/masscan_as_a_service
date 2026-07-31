@@ -1,5 +1,7 @@
 # Masscan as a Service
 
+[![CI](https://github.com/bobek/masscan_as_a_service/actions/workflows/ci.yml/badge.svg)](https://github.com/bobek/masscan_as_a_service/actions/workflows/ci.yml)
+
 It happened to everyone --  forgotten rule in `iptables` caused open access to `docker` control port. Next thing you know, malicious containers running on your infrastructure, sending spam emails at best. Woudn't be great if you get notified, that something on a previously unseen TCP or UDP port started accepting connections on your server?
 
 This project leverages an excellent [masscan](https://github.com/robertdavidgraham/masscan) which can scan whole IPv4 range under 6 minutes (if you really want to push your network). We will also add support for `nmap` as `masscan` [doesn't play nice with IPv6](https://github.com/robertdavidgraham/masscan/issues/7).
@@ -28,8 +30,13 @@ This will give you `masscan_as_a_service` binary in your `bin` directory. As usu
 For development, clone the repository and install it in editable mode with the dev extras:
 
 ```shell
-pip install -e '.[dev]'
+make install   # pip install -e '.[dev]'
+make lint      # ruff
+make test      # pytest
+make README.md # regenerate this file after changing the CLI
 ```
+
+All of the above run on every push and pull request, see [`.github/workflows/ci.yml`](.github/workflows/ci.yml). The tests are offline - they use a fake in place of the Hetzner Cloud client, so no API token is needed and nothing gets provisioned.
 
 ## Theory of Operation
 1. use some system to schedule regular executions. For example gitlab CD or github actions.
