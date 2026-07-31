@@ -1,5 +1,6 @@
 import logging
 import time
+
 from fabric import Connection
 
 
@@ -12,8 +13,7 @@ class SshWorker:
         self.ip = ip_address
         self.logger = logging.getLogger('ssh_worker')
         self.logger.debug(f"Establishing connection to {ip_address}")
-        self.connection = Connection(ip_address, user=user,
-                                     connect_kwargs={"key_filename": [private_key_path]})
+        self.connection = Connection(ip_address, user=user, connect_kwargs={"key_filename": [private_key_path]})
 
     def __del__(self):
         self.logger.debug("Closing SSH connection")
@@ -33,7 +33,7 @@ class SshWorker:
             except AssertionError:
                 self.logger.info(f"Worker {self.ip} returned invalid output.")
                 time.sleep(5)
-            except:
+            except Exception:
                 self.logger.info(f"Worker {self.ip} returned unknown exception.")
                 time.sleep(5)
         return True
@@ -59,4 +59,3 @@ class SshWorker:
             ' -p 1-65535 -p U:1-65535'
             ' -v'
         )
-
